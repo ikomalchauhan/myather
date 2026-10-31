@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rizta Dash</title>
+<meta name="description" content="Mileage and charging dashboard for your Ather Rizta">
+<meta name="theme-color" content="#0f1410">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="veh">Rizta Dash</span>
+    <span class="model">Ather Rizta</span>
+  </div>
+  <button class="icon-btn" id="settingsBtn" aria-label="Settings" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+  </button>
+</div>
+
+<div class="status-strip">
+  <span class="dot off" id="statusDot"></span>
+  <span id="statusText">No data source connected yet</span>
+</div>
+
+<section class="tiles">
+  <div class="tile" id="batteryTile">
+    <div class="label">Battery</div>
+    <div class="big"><span id="batteryVal">—</span><span class="unit">%</span></div>
+    <div class="battery-bar"><span id="batteryBar" style="width:0%"></span></div>
+    <div class="sub" id="chargeState"><span class="pill idle">No data</span></div>
+  </div>
+  <div class="tile" id="rangeTile">
+    <div class="label">Est. range</div>
+    <div class="big"><span id="rangeVal">—</span><span class="unit">km</span></div>
+    <div class="sub" id="rangeSub">—</div>
+  </div>
+  <div class="tile wide" id="odoTile">
+    <div class="label">Odometer</div>
+    <div class="big"><span id="odoVal" class="mono">—</span><span class="unit">km</span></div>
+    <div class="sub" id="odoSub">Connect your ride log sheet to see this</div>
+  </div>
+</section>
+
+<div class="section-head">
+  <h2>Mileage trend</h2>
+  <span class="meta" id="chartMeta">last 14 rides</span>
+</div>
+<div class="chart-card">
+  <svg id="chart" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="Mileage per ride, recent rides"></svg>
+  <div class="chart-legend">
+    <span class="swatch"><i style="background:var(--info)"></i>km / ride</span>
+    <span class="swatch"><i style="background:var(--accent)"></i>Wh / km</span>
+  </div>
+</div>
+
+<div class="section-head">
+  <h2>Recent activity</h2>
+  <span class="meta" id="logMeta"></span>
+</div>
+<div class="log-list" id="logList">
+  <div class="empty-note">
+    No rides or charges logged yet. Open <b>Settings</b> and point this dashboard at your ride-log sheet and your ether-dash instance to see real data here.
+  </div>
+</div>
+
+<footer class="note">Not affiliated with Ather Energy. Pulls only from sources you connect yourself.</footer>
+
+<!-- Settings sheet -->
+<div class="sheet-backdrop" id="sheetBackdrop" hidden>
+  <div class="sheet" role="dialog" aria-label="Settings">
+    <h2>Connect your data</h2>
+    <div class="hint">This app has no connection to Ather on its own — it only reads from sources you set up and link below, on your own device.</div>
+
+    <div class="field">
+      <label for="sheetUrl">Ride-log sheet (CSV)</label>
+      <input id="sheetUrl" type="url" placeholder="https://docs.google.com/.../pub?output=csv" autocomplete="off" spellcheck="false">
+      <div class="help">In your ev_log_bot Google Sheet: File → Share → Publish to web → choose the data sheet/tab → CSV → copy that link here.</div>
+    </div>
+
+    <div class="field">
+      <label for="dashUrl">ether-dash URL</label>
+      <input id="dashUrl" type="url" placeholder="https://your-instance.example.com" autocomplete="off" spellcheck="false">
+      <div class="help">Your own self-hosted ether-dash instance. Used for live battery % and charging status, if its API allows this page to read it.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn secondary" id="cancelBtn" type="button">Close</button>
+      <button class="btn primary" id="saveBtn" type="button">Save &amp; refresh</button>
+    </div>
+    <div class="status-msg" id="settingsStatus"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
